@@ -1,0 +1,43 @@
+# Dependências do Go
+/vendor/
+
+# Arquivos binários gerados
+/bin/
+/build/
+
+# Arquivos de dependência do Go
+/go.sum
+/go.mod
+
+# Arquivos de cache do Go
+*.test
+*.out
+
+# Arquivos do editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*.bak
+
+# Arquivos de logs
+*.log
+
+# Arquivos de banco de dados (MongoDB, SQLite, etc.)
+/data/
+/db/
+
+# Arquivos de configuração de ambiente (como arquivos de chave secreta)
+.env
+.env.local
+.env.*.local
+
+# Diretórios temporários
+/tmp/
+
+# Arquivos de configuração do sistema operacional
+.DS_Store
+Thumbs.db
+
+*.txt
+
