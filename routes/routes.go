@@ -7,7 +7,7 @@ import (
 )
 
 func SetupRoutes(app *fiber.App) {
-	app.Group("/api")
+	// app.Group("/api")
 	app.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("hello, world 👋")
 	})
@@ -28,5 +28,9 @@ func SetupRoutes(app *fiber.App) {
 
 	app.Post("urubu/deposit", func(c fiber.Ctx) error {
 		return controllers.Deposit(c)
+	})
+
+	app.Post("urubu/withdraw", func(c fiber.Ctx) error {
+		return controllers.Withdraw(c)
 	})
 }

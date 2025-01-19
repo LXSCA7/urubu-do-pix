@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"os"
-	"strings"
 	"time"
 	"urubu-do-pix/config"
 	"urubu-do-pix/models"
@@ -76,35 +75,4 @@ func Login(c fiber.Ctx, user models.User) error {
 		"token":   t,
 		"expires": time.Now().Add(24 * time.Hour).Format(time.RFC3339),
 	})
-}
-
-func Verify(c fiber.Ctx) error {
-	authHeader := c.Get("Authorization")
-	if authHeader != "" {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "no authorization token provided.",
-		})
-	}
-
-	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-	if tokenString == authHeader {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "invalid token format",
-		})
-	}
-
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fiber.NewError(fiber.StatusUnauthorized, "unexpected signing method")
-		}
-		return []byte(os.Getenv("JWT_SECRET_KEY")), nil
-	})
-
-	if err != nil || !token.Valid {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Invalid or expired token",
-		})
-	}
-
-	return c.Next()
 }
