@@ -72,3 +72,39 @@ func Withdraw(c fiber.Ctx, username string, amount float64) error {
 		"user": user,
 	})
 }
+
+func Transfer(c fiber.Ctx, senderUsername string, receiver *models.User, amount float64) error {
+	sender := GetByUsername(senderUsername)
+	if sender.Id.IsZero() {
+		return c.SendStatus(fiber.StatusNotFound)
+	}
+
+	if sender.Balance < amount {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "insufficient funds",
+		})
+	}
+
+	senderMsg := "transferencia para" + receiver.Username
+	receiverMsg := "transferencia de" + sender.Username
+
+	err := RemoveUserBalance(&sender, amount, senderMsg)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	err = AddUserBalance(receiver, amount, receiverMsg)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// err := UpdateUserBalance(&sender, senderMsg)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"receiver": receiver,
+		"sender":   sender,
+	})
+}

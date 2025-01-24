@@ -81,3 +81,38 @@ func Withdraw(c fiber.Ctx) error {
 
 	return services.Withdraw(c, usernameStr, body.Amount)
 }
+
+func Transfer(c fiber.Ctx) error {
+	senderUsername, err := Authenticate(c)
+	if err != nil {
+		return err
+	}
+
+	var body struct {
+		Username string  `json:"username"`
+		Amount   float64 `json:"amount"`
+	}
+
+	if err := json.Unmarshal(c.Body(), &body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":   "error",
+			"error":    err.Error(),
+			"expected": body,
+		})
+	}
+
+	if body.Amount <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "amount cannot be less than 0",
+		})
+	}
+
+	recipient := services.GetByUsername(body.Username)
+	if recipient.Id.IsZero() {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "user not found",
+		})
+	}
+
+	return services.Transfer(c, senderUsername, &recipient, body.Amount)
+}

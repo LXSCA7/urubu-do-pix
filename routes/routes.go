@@ -25,12 +25,15 @@ func SetupRoutes(app *fiber.App) {
 	})
 
 	// urubu:
-
 	app.Post("urubu/deposit", func(c fiber.Ctx) error {
 		return controllers.Deposit(c)
 	})
 
 	app.Post("urubu/withdraw", func(c fiber.Ctx) error {
 		return controllers.Withdraw(c)
+	})
+
+	app.Post("urubu/transfer", func(c fiber.Ctx) error {
+		return controllers.Transfer(c)
 	})
 }

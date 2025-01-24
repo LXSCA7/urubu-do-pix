@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"urubu-do-pix/middleware"
 	"urubu-do-pix/models"
 	"urubu-do-pix/services"
 	"urubu-do-pix/utils"
@@ -69,4 +70,23 @@ func Login(c fiber.Ctx) error {
 	json.Unmarshal(c.Body(), &user)
 	return services.Login(c, user)
 	// return c.Status(fiber.StatusOK).JSON(dbUser)
+}
+
+func Authenticate(c fiber.Ctx) (string, error) {
+	middleware.Verify(c)
+	username := c.Locals("username")
+	if username == nil {
+		return "", c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Username not found in request context.",
+		})
+	}
+
+	usernameStr, ok := username.(string)
+	if !ok {
+		return "", c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Username is not valid in request context.",
+		})
+	}
+
+	return usernameStr, nil
 }
