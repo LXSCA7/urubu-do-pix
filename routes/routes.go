@@ -7,37 +7,37 @@ import (
 )
 
 func SetupRoutes(app *fiber.App) {
-	// app.Group("/api")
-	app.Get("/", func(c fiber.Ctx) error {
+	api := app.Group("/api")
+	api.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("hello, world 👋")
 	})
 
-	app.Get("/update-users", func(c fiber.Ctx) error {
+	api.Get("/update-users", func(c fiber.Ctx) error {
 		return controllers.UpdateEmpty(c)
 	})
 
-	app.Post("/user/create", func(c fiber.Ctx) error {
+	api.Post("/user/create", func(c fiber.Ctx) error {
 		return controllers.CreateUser(c)
 	})
 
-	app.Post("user/login", func(c fiber.Ctx) error {
+	api.Post("user/login", func(c fiber.Ctx) error {
 		return controllers.Login(c)
 	})
 
-	app.Get("user/:username", func(c fiber.Ctx) error {
+	api.Get("user/:username", func(c fiber.Ctx) error {
 		return controllers.GetInfo(c)
 	})
 
 	// urubu:
-	app.Post("urubu/deposit", func(c fiber.Ctx) error {
+	api.Post("urubu/deposit", func(c fiber.Ctx) error {
 		return controllers.Deposit(c)
 	})
 
-	app.Post("urubu/withdraw", func(c fiber.Ctx) error {
+	api.Post("urubu/withdraw", func(c fiber.Ctx) error {
 		return controllers.Withdraw(c)
 	})
 
-	app.Post("urubu/transfer", func(c fiber.Ctx) error {
+	api.Post("urubu/transfer", func(c fiber.Ctx) error {
 		return controllers.Transfer(c)
 	})
 }
