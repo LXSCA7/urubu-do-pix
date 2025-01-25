@@ -90,3 +90,7 @@ func Authenticate(c fiber.Ctx) (string, error) {
 
 	return usernameStr, nil
 }
+
+func UpdateEmpty(c fiber.Ctx) error {
+	return services.UpdateEmpty(c)
+}

@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 	"urubu-do-pix/config"
@@ -75,4 +76,25 @@ func Login(c fiber.Ctx, user models.User) error {
 		"token":   t,
 		"expires": time.Now().Add(24 * time.Hour).Format(time.RFC3339),
 	})
+}
+
+func UpdateEmpty(c fiber.Ctx) error {
+	// Obtém a coleção do MongoDB
+	collection := config.GetCollection("urubu_users")
+
+	// Filtro para encontrar documentos onde o campo "transactions" é null
+	filter := bson.M{"transactions": nil}
+
+	// Atualização para definir "transactions" como um array vazio
+	update := bson.M{
+		"$set": bson.M{"transactions": []models.Transaction{}}, // Define como um array vazio
+	}
+
+	// Executa a operação de atualização
+	_, err := collection.UpdateMany(context.Background(), filter, update)
+	if err != nil {
+		return fmt.Errorf("falha ao atualizar documentos: %w", err)
+	}
+
+	return nil
 }

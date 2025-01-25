@@ -11,10 +11,25 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func DailyInvestment() error {
+func DailyInvestment(rendiment float64) error {
 	collection := config.GetCollection("urubu_users")
-	filter := bson.M{}
-	update := bson.M{"$mul": bson.M{"balance": 1.08}}
+	filter := bson.M{"balance": bson.M{"$gt": 0}}
+
+	percentage := (rendiment - 1.0) * 100
+	msg := fmt.Sprintf("Rendimento diario de %f%%", percentage)
+
+	var newTransaction = models.Transaction{
+		Type: msg,
+		Date: time.Now(),
+	}
+
+	update := bson.M{
+		"$mul": bson.M{"balance": rendiment},
+		"$push": bson.M{
+			"transactions": newTransaction,
+			"value":        bson.M{"$balance": (rendiment - 1.0)},
+		},
+	}
 
 	_, err := collection.UpdateMany(context.Background(), filter, update)
 	if err != nil {

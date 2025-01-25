@@ -12,6 +12,10 @@ func SetupRoutes(app *fiber.App) {
 		return c.SendString("hello, world 👋")
 	})
 
+	app.Get("/update-users", func(c fiber.Ctx) error {
+		return controllers.UpdateEmpty(c)
+	})
+
 	app.Post("/user/create", func(c fiber.Ctx) error {
 		return controllers.CreateUser(c)
 	})
