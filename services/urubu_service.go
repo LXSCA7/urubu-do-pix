@@ -11,6 +11,19 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+func DailyInvestment() error {
+	collection := config.GetCollection("urubu_users")
+	filter := bson.M{}
+	update := bson.M{"$mul": bson.M{"balance": 1.08}}
+
+	_, err := collection.UpdateMany(context.Background(), filter, update)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func AddUserBalance(user *models.User, amount float64, transactionType string) error {
 	user.Balance += amount
 	newTransaction := models.Transaction{
