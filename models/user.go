@@ -8,4 +8,5 @@ type User struct {
 	Password     string             `bson:"password"`
 	Balance      float64            `bson:"balance"`
 	Transactions []Transaction      `bson:"transactions"`
+	Deposits     []Deposit          `bson:"deposits"`
 }

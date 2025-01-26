@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 	"urubu-do-pix/config"
 	"urubu-do-pix/models"
@@ -47,7 +48,6 @@ func AddUserBalance(user *models.User, amount float64, transactionType string) e
 		Date:  time.Now(),
 	}
 	user.Transactions = append(user.Transactions, newTransaction)
-
 	return UpdateUserBalance(user, newTransaction)
 }
 
@@ -72,6 +72,15 @@ func UpdateUserBalance(user *models.User, newTransaction models.Transaction) err
 		{Key: "$push", Value: bson.D{
 			{Key: "transactions", Value: newTransaction},
 		}},
+	}
+
+	if strings.ToUpper(newTransaction.Type) == "DEPOSITO" {
+		var deposit = models.Deposit{
+			Value: newTransaction.Value,
+			Date:  time.Now(),
+		}
+		appd := bson.E{Key: "$push", Value: bson.D{{Key: "deposits", Value: deposit}}}
+		update = append(update, appd)
 	}
 
 	_, err := collection.UpdateOne(context.Background(), bson.D{{Key: "_id", Value: user.Id}}, update)

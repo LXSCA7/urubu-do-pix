@@ -44,6 +44,7 @@ func CreateUser(c fiber.Ctx) error {
 	newUser.Password = string(hash)
 	newUser.Balance = 0.0
 	newUser.Transactions = []models.Transaction{}
+	newUser.Deposits = []models.Deposit{}
 
 	services.CreateItem(&newUser, "urubu_users")
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{

@@ -28,6 +28,10 @@ func SetupRoutes(app *fiber.App) {
 		return controllers.GetInfo(c)
 	})
 
+	api.Post("user/update-deposits", func(c fiber.Ctx) error {
+		return controllers.CreateDepositsFieldForAllUsers()
+	})
+
 	// urubu:
 	api.Post("urubu/deposit", func(c fiber.Ctx) error {
 		return controllers.Deposit(c)

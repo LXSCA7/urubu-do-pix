@@ -1,11 +1,16 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
+	"urubu-do-pix/config"
 	"urubu-do-pix/middleware"
+	"urubu-do-pix/models"
 	"urubu-do-pix/services"
 
 	"github.com/gofiber/fiber/v3"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func Deposit(c fiber.Ctx) error {
@@ -115,4 +120,23 @@ func Transfer(c fiber.Ctx) error {
 	}
 
 	return services.Transfer(c, senderUsername, &recipient, body.Amount)
+}
+
+func CreateDepositsFieldForAllUsers() error {
+	collection := config.GetCollection("urubu_users")
+
+	filter := bson.M{
+		"deposits": bson.M{"$exists": false},
+	}
+	update := bson.M{
+		"$set": bson.M{"deposits": []models.Deposit{}}, // Array vazio de depósitos
+	}
+
+	result, err := collection.UpdateMany(context.Background(), filter, update)
+	if err != nil {
+		return fmt.Errorf("failed to create deposits field: %v", err)
+	}
+
+	fmt.Printf("Campo 'deposits' criado para %d usuarios\n", result.ModifiedCount)
+	return nil
 }
