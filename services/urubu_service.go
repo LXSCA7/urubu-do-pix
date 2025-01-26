@@ -77,9 +77,14 @@ func UpdateUserBalance(user *models.User, newTransaction models.Transaction) err
 	if strings.ToUpper(newTransaction.Type) == "DEPOSITO" {
 		var deposit = models.Deposit{
 			Value: newTransaction.Value,
-			Date:  time.Now(),
+			Date:  time.Now().AddDate(0, 0, -31),
 		}
 		appd := bson.E{Key: "$push", Value: bson.D{{Key: "deposits", Value: deposit}}}
+		update = append(update, appd)
+	}
+
+	if strings.ToUpper(newTransaction.Type) == "SAQUE" {
+		appd := bson.E{Key: "$pop", Value: bson.D{{Key: "deposits", Value: -1}}}
 		update = append(update, appd)
 	}
 
@@ -100,6 +105,14 @@ func Withdraw(c fiber.Ctx, username string, amount float64) error {
 	if user.Balance < amount {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "invalid amount",
+		})
+	}
+
+	deposit := user.Deposits[0]
+
+	if time.Since(deposit.Date) < 30*24*time.Hour {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Usuário não pode sacar com menos de 30 dias de depósito.",
 		})
 	}
 

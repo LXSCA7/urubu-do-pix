@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"urubu-do-pix/config"
-	"urubu-do-pix/middleware"
 	"urubu-do-pix/models"
 	"urubu-do-pix/services"
 
@@ -54,18 +53,9 @@ func Deposit(c fiber.Ctx) error {
 }
 
 func Withdraw(c fiber.Ctx) error {
-	middleware.Verify(c)
-	username := c.Locals("username")
-	if username == nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Username not found in request context.",
-		})
-	}
-	usernameStr, ok := username.(string)
-	if !ok {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Username is not valid in request context.",
-		})
+	username, err := Authenticate(c)
+	if err != nil {
+		return err
 	}
 
 	var body struct {
@@ -84,7 +74,7 @@ func Withdraw(c fiber.Ctx) error {
 		})
 	}
 
-	return services.Withdraw(c, usernameStr, body.Amount)
+	return services.Withdraw(c, username, body.Amount)
 }
 
 func Transfer(c fiber.Ctx) error {
