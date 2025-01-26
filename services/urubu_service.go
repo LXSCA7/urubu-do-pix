@@ -77,7 +77,7 @@ func UpdateUserBalance(user *models.User, newTransaction models.Transaction) err
 	if strings.ToUpper(newTransaction.Type) == "DEPOSITO" {
 		var deposit = models.Deposit{
 			Value: newTransaction.Value,
-			Date:  time.Now().AddDate(0, 0, -31),
+			Date:  time.Now(), //.AddDate(0, 0, -31),
 		}
 		appd := bson.E{Key: "$push", Value: bson.D{{Key: "deposits", Value: deposit}}}
 		update = append(update, appd)
